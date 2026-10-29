@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Local Ops Lab — a sandbox showing how deterministic Python automations can work with local folders and connected cloud services.">
+  <meta name="theme-color" content="#10130f">
+  <title>Local Ops Lab — Automation Sandbox</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310130f'/%3E%3Cpath d='M16 19h14l4 5h14v22H16z' fill='%23c6ff4a'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to dashboard</a>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Local Ops Lab home">
+      <span class="brand-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span><strong>LOCAL OPS</strong><small>automation lab</small></span>
+    </a>
+    <div class="topbar-center" aria-label="Environment">
+      <span class="pulse" aria-hidden="true"></span>
+      <span>Sandbox environment</span>
+      <kbd>LOCAL-FIRST</kbd>
+    </div>
+    <button class="privacy-button" id="privacyButton" type="button">
+      <span class="shield" aria-hidden="true">◇</span>
+      Privacy model
+    </button>
+  </header>
+
+  <div class="app-shell">
+    <aside class="rail" aria-label="Primary navigation">
+      <nav>
+        <button class="rail-button active" type="button" aria-label="Command center" aria-current="page">
+          <span aria-hidden="true">⌂</span><small>Home</small>
+        </button>
+        <button class="rail-button" type="button" data-scroll="sources" aria-label="Data sources">
+          <span aria-hidden="true">⌁</span><small>Sources</small>
+        </button>
+        <button class="rail-button" type="button" data-scroll="automations" aria-label="Automations">
+          <span aria-hidden="true">↻</span><small>Runs</small>
+        </button>
+        <button class="rail-button" type="button" data-scroll="architecture" aria-label="Architecture">
+          <span aria-hidden="true">⌘</span><small>Map</small>
+        </button>
+      </nav>
+      <div class="rail-footer"><span>PY</span><small>no AI<br>required</small></div>
+    </aside>
+
+    <main id="main">
+      <section class="intro">
+        <div>
+          <p class="eyebrow">LOCAL AUTOMATION CONTROL PLANE <span>v0.1</span></p>
+          <h1>Your files.<br><em>Your rules.</em><br>Your machine.</h1>
+        </div>
+        <div class="intro-copy">
+          <p>A working sandbox for deterministic automations across local folders, GitHub, Google Drive, and mobile uploads—without sending your files to an AI model.</p>
+          <div class="intro-actions">
+            <button class="primary-button" id="chooseFolderHero" type="button">Choose a local folder <span>→</span></button>
+            <button class="text-button" data-scroll="architecture" type="button">See how it works</button>
+          </div>
+          <p class="compatibility" id="compatibility"><span></span> Checking browser folder support…</p>
+        </div>
+      </section>
+
+      <section class="status-strip" aria-label="System status">
+        <div><span>01</span><p><strong>Runs locally</strong><small>Python helper on your machine</small></p></div>
+        <div><span>02</span><p><strong>Connects safely</strong><small>OAuth for cloud services</small></p></div>
+        <div><span>03</span><p><strong>Asks first</strong><small>Explicit folder permissions</small></p></div>
+        <div><span>04</span><p><strong>Leaves a trail</strong><small>Every action is logged</small></p></div>
+      </section>
+
+      <section class="workspace-grid" id="sources">
+        <article class="panel sources-panel">
+          <div class="panel-heading">
+            <div><p class="panel-kicker">INPUTS</p><h2>Connected sources</h2></div>
+            <span class="count-badge" id="sourceCount">0 / 4</span>
+          </div>
+
+          <div class="source-list">
+            <button class="source-card local-source" id="chooseFolder" type="button">
+              <span class="source-icon folder-icon" aria-hidden="true">▰</span>
+              <span class="source-copy"><strong>Local folder</strong><small id="folderStatus">Not connected</small></span>
+              <span class="source-action" id="folderAction">Choose</span>
+            </button>
+            <button class="source-card" data-connector="GitHub" type="button">
+              <span class="source-icon" aria-hidden="true">GH</span>
+              <span class="source-copy"><strong>GitHub</strong><small>Repositories and deployments</small></span>
+              <span class="source-action">Connect</span>
+            </button>
+            <button class="source-card" data-connector="Google Drive / Workspace" type="button">
+              <span class="source-icon drive-icon" aria-hidden="true">△</span>
+              <span class="source-copy"><strong>Google Drive</strong><small>Drive and Workspace files</small></span>
+              <span class="source-action">Connect</span>
+            </button>
+            <label class="source-card upload-source" for="phoneFiles">
+              <span class="source-icon" aria-hidden="true">↥</span>
+              <span class="source-copy"><strong>Phone inbox</strong><small id="phoneStatus">Choose files from this device</small></span>
+              <span class="source-action">Upload</span>
+            </label>
+            <input id="phoneFiles" type="file" multiple hidden>
+            <input id="folderFallback" type="file" webkitdirectory multiple hidden>
+          </div>
+
+          <div class="permission-note">
+            <span aria-hidden="true">◎</span>
+            <p><strong>Permission stays visible.</strong> The app receives only the files you choose. Closing the permission ends access unless you explicitly reconnect.</p>
+          </div>
+        </article>
+
+        <article class="panel file-panel" aria-live="polite">
+          <div class="panel-heading">
+            <div><p class="panel-kicker">LOCAL VIEW</p><h2 id="filePanelTitle">Folder console</h2></div>
+            <button class="icon-button" id="clearFiles" type="button" aria-label="Clear selected files">×</button>
+          </div>
+
+          <div class="empty-state" id="fileEmpty">
+            <div class="empty-graphic" aria-hidden="true"><span></span><span></span><span></span></div>
+            <h3>No folder connected</h3>
+            <p>Choose a folder to inspect its contents locally. Nothing is uploaded by this demo.</p>
+          </div>
+
+          <div class="file-results" id="fileResults" hidden>
+            <div class="file-summary">
+              <div><strong id="fileCount">0</strong><span>files</span></div>
+              <div><strong id="folderSize">0 KB</strong><span>visible size</span></div>
+              <div><strong id="fileTypes">0</strong><span>file types</span></div>
+            </div>
+            <ul class="file-list" id="fileList"></ul>
+          </div>
+        </article>
+      </section>
+
+      <section class="automation-section" id="automations">
+        <div class="section-heading">
+          <div><p class="panel-kicker">RULE-BASED AGENTS</p><h2>Python does the repeatable work.</h2></div>
+          <p>Each automation follows visible rules, asks before consequential actions, verifies its result, and writes an audit entry.</p>
+        </div>
+
+        <div class="automation-table" role="table" aria-label="Available automations">
+          <div class="automation-row table-head" role="row">
+            <span role="columnheader">Automation</span><span role="columnheader">Trigger</span><span role="columnheader">Scope</span><span role="columnheader">Status</span><span></span>
+          </div>
+          <div class="automation-row" role="row">
+            <div class="automation-name" role="cell"><span class="auto-icon green">✓</span><p><strong>Folder health check</strong><small>Duplicates, names, extensions, empty files</small></p></div>
+            <span role="cell">Manual</span><span role="cell">Selected folder</span><span class="ready" role="cell">Ready</span><button class="run-button" data-run="folder" type="button">Run</button>
+          </div>
+          <div class="automation-row" role="row">
+            <div class="automation-name" role="cell"><span class="auto-icon orange">⌁</span><p><strong>Repository guardian</strong><small>Fetch, status, tests, secrets, live URL</small></p></div>
+            <span role="cell">Every morning</span><span role="cell">GitHub</span><span class="needs-source" role="cell">Needs source</span><button class="run-button" data-run="github" type="button">Preview</button>
+          </div>
+          <div class="automation-row" role="row">
+            <div class="automation-name" role="cell"><span class="auto-icon blue">▤</span><p><strong>Document package validator</strong><small>DOCX, PDF, filenames, required attachments</small></p></div>
+            <span role="cell">New file</span><span role="cell">Local + Drive</span><span class="ready" role="cell">Ready</span><button class="run-button" data-run="documents" type="button">Run</button>
+          </div>
+          <div class="automation-row" role="row">
+            <div class="automation-name" role="cell"><span class="auto-icon yellow">◇</span><p><strong>Website watchdog</strong><small>Uptime, assets, links, screenshots</small></p></div>
+            <span role="cell">Hourly</span><span role="cell">Public URLs</span><span class="demo" role="cell">Demo</span><button class="run-button" data-run="website" type="button">Preview</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="architecture-section" id="architecture">
+        <div class="architecture-copy">
+          <p class="panel-kicker">HYBRID ARCHITECTURE</p>
+          <h2>Hosted controls.<br>Local execution.</h2>
+          <p>The Vercel dashboard coordinates the experience. A small Python companion on your computer performs approved local actions. Cloud services connect through their normal authorization screens.</p>
+          <ul>
+            <li><span>1</span><p><strong>Browser dashboard</strong><small>Choose tasks and review results from any device.</small></p></li>
+            <li><span>2</span><p><strong>Local Python bridge</strong><small>Reads only approved folders and runs deterministic rules.</small></p></li>
+            <li><span>3</span><p><strong>Cloud connectors</strong><small>GitHub and Google Workspace use revocable OAuth access.</small></p></li>
+          </ul>
+        </div>
+
+        <div class="architecture-map" aria-label="Architecture diagram">
+          <div class="map-node browser-node"><span>WEB</span><strong>Vercel dashboard</strong><small>HTTPS · anywhere</small></div>
+          <div class="map-line line-a"><i></i></div>
+          <div class="map-line line-b"><i></i></div>
+          <div class="map-line line-c"><i></i></div>
+          <div class="map-node local-node"><span>PY</span><strong>Local helper</strong><small>127.0.0.1 · permissioned</small></div>
+          <div class="map-node github-node"><span>GH</span><strong>GitHub</strong><small>OAuth connection</small></div>
+          <div class="map-node drive-node"><span>△</span><strong>Google Workspace</strong><small>OAuth connection</small></div>
+          <div class="map-caption"><span></span> Your file contents stay local unless a task explicitly uploads them.</div>
+        </div>
+      </section>
+
+      <section class="activity-panel" aria-live="polite">
+        <div class="activity-head"><div><span class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span><strong>RUN LOG</strong></div><button id="clearLog" type="button">Clear</button></div>
+        <div class="activity-log" id="activityLog">
+          <p><time>READY</time><span>Sandbox loaded. Waiting for a folder or automation.</span></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="infoDialog">
+    <button class="dialog-close" id="dialogClose" type="button" aria-label="Close dialog">×</button>
+    <p class="panel-kicker" id="dialogKicker">CONNECTION</p>
+    <h2 id="dialogTitle">Connection details</h2>
+    <div id="dialogBody"></div>
+    <button class="primary-button dialog-action" id="dialogAction" type="button">Got it</button>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
